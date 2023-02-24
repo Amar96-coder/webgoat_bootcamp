@@ -10,7 +10,7 @@
 
     - name: copy war from Jenkins to target host
       copy:
-        src: /var/lib/jenkins/workspace/Amar-Deploy-on-Container-Trivy/target/webgoat-8.2.3-SNAPSHOT.jar
+        src: /var/lib/jenkins/workspace/Amar-Deploy-on-Container-Trivy-Ansible/target/webgoat-8.2.3-SNAPSHOT.jar
         dest: /home/bootcamper
 
     - name: stop current container
