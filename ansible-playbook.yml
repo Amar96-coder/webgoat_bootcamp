@@ -1,0 +1,50 @@
+---
+- hosts: all # comes from the hosts file
+  become: true # become sudo
+  gather_facts: false # save time and not gather info
+
+  tasks:
+    - name: set sudo password
+      set_fact:
+        ansible_sudo_pass: "{{ ansible_ssh_pass }}"
+
+    - name: copy war from Jenkins to target host
+      copy:
+        src: /var/lib/jenkins/workspace/Amar-Deploy-on-Container-Trivy/target/webgoat-8.2.3-SNAPSHOT.jar
+        dest: /home/bootcamper
+
+    - name: stop current container
+      command: docker stop webgoat-container
+      ignore_errors: yes # in case container doesn't exist
+
+    - name: remove stopped container
+      command: docker rm webgoat-container
+      ignore_errors: yes # in case container doesn't exist
+
+    - name: remove docker images 
+      command: docker rmi webgoat-container-image:latest
+      ignore_errors: yes # in case image does not exist
+
+    - name: create docker image using war file
+      command: docker build -t webgoat-image:latest .
+      args:
+        chdir: /home/bootcamper
+    - name: create docker image using war file
+      command: trivy image webgoat-image --scanners vuln -f json -o /home/bootcamper/test.json
+
+    - name: API
+      shell: 'curl -X POST "http://10.19.0.7:8080/api/v2/import-scan/" \
+                -H "accept: application/json" \
+                -H "Content-Type: multipart/form-data" \
+                -H "Authorization: Token 117d0c1d1fbc70d4e10ddd323b44346971b3d2bc" \
+                -F "minimum_severity=Info" \
+                -F "active=true" \
+                -F "verified=true" \
+                -F "scan_type=Trivy Scan" \
+                -F "file=@<PATH_TO_REPORT_FILE_ON_YOUR_VM>" \
+                -F "product_name=Bootcamp2023" \
+                -F "engagement_name=amar" \
+                -F "test_title=amar_scan"'
+
+    - name: run container from docker image
+      command: docker run -d --name webgoat-container -p 8081:8080 webgoat-image:latest
