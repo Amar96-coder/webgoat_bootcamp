@@ -41,7 +41,7 @@
       uri:
         url: "http://10.19.0.7:8080/api/v2/import-scan/"
         method: POST
-        user: "{{ defectdojo_api_key }}"
+        client_key: "{{ defectdojo_api_key }}"
         body_format: json
         body: "{{ json_data['content'] | b64decode}}"
         retrun_content: yes
