@@ -33,18 +33,24 @@
       command: trivy image webgoat-image --scanners vuln -f json -o /home/bootcamper/test.json
 
     - name: API
-      shell: 'curl -X POST "http://10.19.0.7:8080/api/v2/import-scan/" \
-                -H "accept: application/json" \
-                -H "Content-Type: multipart/form-data" \
-                -H "Authorization: Token 117d0c1d1fbc70d4e10ddd323b44346971b3d2bc" \
-                -F "minimum_severity=Info" \
-                -F "active=true" \
-                -F "verified=true" \
-                -F "scan_type=Trivy Scan" \
-                -F "file=@<PATH_TO_REPORT_FILE_ON_YOUR_VM>" \
-                -F "product_name=Bootcamp2023" \
-                -F "engagement_name=amar" \
-                -F "test_title=amar_scan"'
+      vars:
+        json_file_path: /home/bootcamper/test.json
+        defectdojo_api_key: 117d0c1d1fbc70d4e10ddd323b44346971b3d2bc
+      tasks:
+        - name: Read JSON File
+          slurp:
+            src: "{{ json_file_path }}"
+          register: json_data
+        - name: Send JSON data to DefectDojo API
+          uri:
+            url: "http://10.19.0.7:8080/api/v2/import-scan/"
+            method: POST
+            user: "{{ defectdojo_api_key }}"
+            body_format: json
+            body: "{{ json_data['content'] | b64decode}}"
+            retrun_content: yes
+            status_code: 200
+
 
     - name: run container from docker image
       command: docker run -d --name webgoat-container -p 8081:8080 webgoat-image:latest
