@@ -2,7 +2,9 @@
 - hosts: all # comes from the hosts file
   become: true # become sudo
   gather_facts: false # save time and not gather info
-
+  vars:
+    json_file_path: /home/bootcamper/test.json
+    defectdojo_api_key: 117d0c1d1fbc70d4e10ddd323b44346971b3d2bc
   tasks:
     - name: set sudo password
       set_fact:
@@ -31,10 +33,6 @@
         chdir: /home/bootcamper
     - name: create docker image using war file
       command: trivy image webgoat-image --scanners vuln -f json -o /home/bootcamper/test.json
-    - name: set variables
-      vars:
-        json_file_path: /home/bootcamper/test.json
-        defectdojo_api_key: 117d0c1d1fbc70d4e10ddd323b44346971b3d2bc
     - name: Read JSON File
       slurp:
         src: "{{ json_file_path }}"
