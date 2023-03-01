@@ -31,7 +31,6 @@
         chdir: /home/bootcamper
     - name: create docker image using war file
       command: trivy image webgoat-image --scanners vuln -f json -o /home/bootcamper/test.json
-
     - name: API
       vars:
         json_file_path: /home/bootcamper/test.json
@@ -50,7 +49,5 @@
             body: "{{ json_data['content'] | b64decode}}"
             retrun_content: yes
             status_code: 200
-
-
     - name: run container from docker image
       command: docker run -d --name webgoat-container -p 8081:8080 webgoat-image:latest
