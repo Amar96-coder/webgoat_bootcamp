@@ -36,9 +36,9 @@
         json_file_path: /home/bootcamper/test.json
         defectdojo_api_key: 117d0c1d1fbc70d4e10ddd323b44346971b3d2bc
     - name: Read JSON File
-        slurp:
-          src: "{{ json_file_path }}"
-        register: json_data
+      slurp:
+        src: "{{ json_file_path }}"
+      register: json_data
     - name: Send JSON data to DefectDojo API
       uri:
         url: "http://10.19.0.7:8080/api/v2/import-scan/"
