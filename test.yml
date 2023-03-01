@@ -31,6 +31,7 @@
         chdir: /home/bootcamper
     - name: create docker image using war file
       command: trivy image webgoat-image --scanners vuln -f json -o /home/bootcamper/test.json
+      
     - name: set variables
       vars:
         json_file_path: /home/bootcamper/test.json
